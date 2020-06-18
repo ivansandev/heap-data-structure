@@ -2,36 +2,38 @@
 using namespace std;
 
 int sizeOfHeap = 0;
-int sizeOfTree = 0;
+int sizeOfArray = 0;
 
 void swap(int *a, int *b)
 {
-   int t;
-   t = *a;
+   // Used for swapping elements in the heap (also called sifting the elements up/down)
+   int temp;
+   temp = *a;
    *a = *b;
-   *b = t;
+   *b = temp;
 }
 
-int leftChild(int arr[], int indexOfParent)
+int leftChild(int indexOfParent)
 {
-   // Get the index of the left child of the current selected element (by index, not value)
-   if ((2 * indexOfParent < sizeOfTree) && (indexOfParent >= 1))
-      return indexOfParent * 2 - 1;
+   // Get the index of the left child of the  selected by index element
+   if ((2 * indexOfParent < sizeOfArray) && (indexOfParent >= 1))
+      return indexOfParent * 2;
    return -1;
 }
 
-int rightChild(int arr[], int indexOfParent)
+int rightChild(int indexOfParent)
 {
-   // Get the index of the right child of the current selected element  (by index, not value)
-   if (((2 * indexOfParent + 1) < sizeOfTree) && (indexOfParent >= 1))
-      return indexOfParent * 2 - 1;
+   // Get the index of the right child of the selected by index element
+   if (((2 * indexOfParent + 1) < sizeOfArray) && (indexOfParent >= 1))
+      return indexOfParent * 2 + 1;
    return -1;
 }
 
 int getParent(int arr[], int indexOfChild)
 {
    // Get the index of the parent of the current selected element
-   if ((indexOfChild > 1) && (indexOfChild < sizeOfTree))
+   // Not used, only for demonstrating purposes
+   if ((indexOfChild > 1) && (indexOfChild < sizeOfArray))
       return indexOfChild / 2;
    return -1;
 }
@@ -41,8 +43,8 @@ void heapify(int arr[], int index)
    // Better way of inserting an element into the heap
    // Time it takes for creation:
    // O(n)
-   int leftChildIndex = leftChild(arr, index);
-   int rightChildIndex = rightChild(arr, index);
+   int leftChildIndex = leftChild(index);
+   int rightChildIndex = rightChild(index);
    int largest = index;
 
    if ((leftChildIndex <= sizeOfHeap) && (leftChildIndex > 0))
@@ -53,7 +55,7 @@ void heapify(int arr[], int index)
       }
    }
 
-   if ((rightChildIndex <= sizeOfTree && (rightChildIndex > 0)))
+   if ((rightChildIndex <= sizeOfHeap && (rightChildIndex > 0)))
    {
       if (arr[rightChildIndex] > arr[largest])
       {
@@ -70,6 +72,7 @@ void heapify(int arr[], int index)
 
 void heapsort(int a[])
 {
+   int temp_sizeOfHeap = sizeOfHeap;
    while (sizeOfHeap > 0)
    {
       swap(&a[1], &a[sizeOfHeap]);
@@ -80,6 +83,8 @@ void heapsort(int a[])
 
 void insertToHeap(int array[], int n)
 {
+   // This is a more basic way for creating the heap function (instead of the heapify function)
+   // but it is much slower, especially for advanced tree structures
    // Time it takes for creation:
    // O(n*log(n))
    int temp = array[n];
@@ -122,31 +127,43 @@ int deleteFromHeap(int arr[], int n)
    return val;
 }
 
-void createMaxHeap(int unsorted_arr[])
+void buildAdvancedMaxHeap(int unsorted_arr[])
 {
-   // Creates a heap and sorts it from min to max (max-heap)
-   for (int i = 1; i < sizeOfHeap; i++)
-      // Slower but more simple function for creating the heap
-      // insertToHeap(unsorted_arr, i);
+   // Creates a heap and sorts it from max to min (max-heap)
+   // heapify is the most optimal function for creating a heap
+   int i;
+   for (i = sizeOfHeap / 2; i >= 1; i--)
       heapify(unsorted_arr, i);
+}
+
+void buildBasicMaxHeap(int unsorted_arr[])
+{
+   // Creates a heap and sorts it from max to min (max-heap)
+   // insertToHeap is a more basic funciton, but also it is much slower
+   for (int i = 1; i < sizeOfHeap; i++)
+      insertToHeap(unsorted_arr, i);
 }
 
 int main()
 {
+   // The tree is going to start from index 1, so index 0 in the array should be ignored
    int arr[] = {0, 1, 5, 2, 3, 10, 9, 19};
-   sizeOfTree = sizeof(arr) / sizeof(arr[0]);
-   sizeOfHeap = sizeOfTree - 1;
-   createMaxHeap(arr);
+   sizeOfArray = sizeof(arr) / sizeof(arr[0]);
+   sizeOfHeap = sizeOfArray - 1;
+
+   buildAdvancedMaxHeap(arr);
    for (int i = 1; i < sizeof(arr) / sizeof(int); i++)
    {
       cout << arr[i] << " ";
    }
    cout << endl;
+
    heapsort(arr);
    for (int i = 1; i < sizeof(arr) / sizeof(int); i++)
    {
       cout << arr[i] << " ";
    }
    cout << endl;
+
    return 0;
 }
